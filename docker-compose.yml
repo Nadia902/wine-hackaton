@@ -1,0 +1,57 @@
+services:
+  # PostgreSQL + pgvector
+  wine-db:
+    image: pgvector/pgvector:pg16
+    container_name: wine-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-wine_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wine_secret_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-wine_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - wine-db-data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - wine-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-wine_user} -d ${POSTGRES_DB:-wine_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  # FastAPI + SigLIP backend
+  wine-app:
+    build: .
+    container_name: wine-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: wine-db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-wine_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-wine_secret_2026}
+      DB_NAME: ${POSTGRES_DB:-wine_db}
+    depends_on:
+      wine-db:
+        condition: service_healthy
+    networks:
+      - wine-network
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '3.0'
+
+volumes:
+  wine-db-data:
+
+networks:
+  wine-network:
+    driver: bridge

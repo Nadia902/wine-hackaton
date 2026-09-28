@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Вино — Своё Вино</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-inner">
+                <a href="/" class="back-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </a>
+                <div class="logo">
+                    <img src="/static/svoe-vino-logo.svg" alt="Своё Вино" class="logo-img">
+                </div>
+            </div>
+        </header>
+
+        <main class="wine-detail" id="wineDetail">
+            <div class="loading-card">
+                <div class="spinner"></div>
+                <p>Загружаем карточку...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function renderStars(rating) {
+            const full = Math.floor(rating);
+            const half = rating % 1 >= 0.5 ? 1 : 0;
+            const empty = 5 - full - half;
+            let html = '';
+            for (let i = 0; i < full; i++) html += '<span class="star star-full">★</span>';
+            if (half) html += '<span class="star star-half">★</span>';
+            for (let i = 0; i < empty; i++) html += '<span class="star star-empty">☆</span>';
+            return html;
+        }
+
+        async function loadWine() {
+            const slug = window.location.pathname.split('/').pop();
+            const detail = document.getElementById('wineDetail');
+
+            try {
+                const res = await fetch(`/api/wine/${slug}`);
+                if (!res.ok) throw new Error('Wine not found');
+                const wine = await res.json();
+
+                document.title = `${wine.name} — Своё Вино`;
+
+                detail.innerHTML = `
+                    <div class="wine-hero">
+                        <img src="${wine.image_url}" alt="${wine.name}" class="wine-hero-img" onerror="this.style.display='none'">
+                    </div>
+                    <div class="wine-info">
+                        <div class="wine-header">
+                            <h1 class="wine-name">${wine.name}</h1>
+                            ${wine.rating ? `<div class="wine-rating"><span class="rating-badge">${wine.rating}</span></div>` : ''}
+                        </div>
+                        <p class="wine-producer">${wine.producer}</p>
+
+                        <div class="wine-ratings">
+                            <h3 class="wine-ratings-title">Рейтинг вина</h3>
+                            <div class="wine-ratings-grid">
+                                <div class="rating-block">
+                                    <span class="rating-block-label">Роскачество</span>
+                                    <div class="rating-score">
+                                        <span class="rating-score-value">${wine.quality_rating || 4.1}</span>
+                                        <span class="rating-score-max">/ 5</span>
+                                    </div>
+                                </div>
+                                <div class="rating-block">
+                                    <span class="rating-block-label">Сомелье</span>
+                                    <div class="rating-score">
+                                        <span class="rating-score-value">${wine.sommelier_rating || 87}</span>
+                                        <span class="rating-score-max">/ 100</span>
+                                    </div>
+                                </div>
+                                <div class="rating-block">
+                                    <span class="rating-block-label">Народный</span>
+                                    <div class="rating-score">
+                                        <span class="rating-score-value">${wine.people_rating || 4.2}</span>
+                                        <span class="rating-score-max">/ 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="wine-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Регион</span>
+                                <span class="meta-value">${wine.region || '—'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Сорт</span>
+                                <span class="meta-value">${wine.grape || '—'}</span>
+                            </div>
+                            ${wine.year ? `
+                            <div class="meta-item">
+                                <span class="meta-label">Год</span>
+                                <span class="meta-value">${wine.year}</span>
+                            </div>` : ''}
+                            <div class="meta-item">
+                                <span class="meta-label">Тип</span>
+                                <span class="meta-value">${wine.category || '—'}</span>
+                            </div>
+                            ${wine.alcohol ? `
+                            <div class="meta-item">
+                                <span class="meta-label">Крепость</span>
+                                <span class="meta-value">${wine.alcohol}%</span>
+                            </div>` : ''}
+                        </div>
+
+                        ${wine.description ? `
+                        <div class="wine-section">
+                            <h3>Описание</h3>
+                            <p>${wine.description}</p>
+                        </div>` : ''}
+
+                        ${wine.food_pairing ? `
+                        <div class="wine-section">
+                            <h3>С чем подавать</h3>
+                            <p>${wine.food_pairing}</p>
+                        </div>` : ''}
+
+                        ${wine.price ? `
+                        <div class="wine-price">
+                            <span class="price-value">${wine.price}</span>
+                        </div>` : ''}
+                    </div>
+                `;
+            } catch (err) {
+                detail.innerHTML = `
+                    <div class="not-found-card">
+                        <div class="not-found-icon">🔍</div>
+                        <h2>Вино не найдено</h2>
+                        <p>Карточка не найдена в каталоге.</p>
+                        <a href="/" class="btn btn-primary">Вернуться к сканеру</a>
+                    </div>
+                `;
+            }
+        }
+
+        loadWine();
+    </script>
+</body>
+</html>

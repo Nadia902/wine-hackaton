@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Своё Вино — Сканер</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-inner">
+                <div class="logo">
+                    <img src="/static/svoe-vino-logo.svg" alt="Своё Вино" class="logo-img">
+                </div>
+                <span class="badge">Сканер</span>
+            </div>
+        </header>
+
+        <!-- Scanner Section -->
+        <section class="scanner-section" id="scannerSection">
+            <div class="scanner-card">
+                <div class="scanner-illustration">
+                    <img src="/static/scanner.svg" alt="Сканер вина" class="scanner-bottle-svg">
+                </div>
+                <h1 class="scanner-title">Наведите камеру<br>на этикетку</h1>
+                <p class="scanner-subtitle">Мгновенно узнайте всё о вине</p>
+
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept="image/*" capture="environment" hidden>
+                    <button class="btn btn-primary btn-camera" id="cameraBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        Сфотографировать
+                    </button>
+                    <button class="btn btn-secondary" id="galleryBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        Выбрать из галереи
+                    </button>
+                </div>
+
+                <!-- Drag & Drop -->
+                <div class="drop-overlay" id="dropOverlay">
+                    <div class="drop-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <p>Отпустите фотографию</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section class="loading-section hidden" id="loadingSection">
+            <div class="loading-card">
+                <div class="spinner"></div>
+                <p class="loading-text">Распознаём вино...</p>
+                <p class="loading-subtext" id="loadingSubtext">Анализируем этикетку</p>
+            </div>
+        </section>
+
+        <!-- Result Section -->
+        <section class="result-section hidden" id="resultSection">
+            <div class="result-card" id="resultCard">
+                <!-- Wine card content injected here -->
+            </div>
+            <button class="btn btn-outline" id="scanAgainBtn">
+                Сканировать ещё
+            </button>
+        </section>
+
+        <!-- Not Found Section -->
+        <section class="not-found-section hidden" id="notFoundSection">
+            <div class="not-found-card">
+                <div class="not-found-sad-animal" id="sadAnimal">
+                    <svg class="sad-animal-svg" viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Body -->
+                        <ellipse cx="100" cy="130" rx="55" ry="40" fill="#D4C5B0"/>
+                        <!-- Head -->
+                        <circle cx="100" cy="70" r="40" fill="#D4C5B0"/>
+                        <!-- Ears -->
+                        <ellipse cx="68" cy="42" rx="14" ry="18" fill="#C4B5A0" transform="rotate(-15 68 42)"/>
+                        <ellipse cx="132" cy="42" rx="14" ry="18" fill="#C4B5A0" transform="rotate(15 132 42)"/>
+                        <ellipse cx="68" cy="42" rx="9" ry="12" fill="#E8D5C0" transform="rotate(-15 68 42)"/>
+                        <ellipse cx="132" cy="42" rx="9" ry="12" fill="#E8D5C0" transform="rotate(15 132 42)"/>
+                        <!-- Eyes (sad) -->
+                        <circle cx="85" cy="65" r="5" fill="#5A4A3A"/>
+                        <circle cx="115" cy="65" r="5" fill="#5A4A3A"/>
+                        <circle cx="83" cy="63" r="2" fill="white"/>
+                        <circle cx="113" cy="63" r="2" fill="white"/>
+                        <!-- Sad eyebrows -->
+                        <line x1="78" y1="56" x2="90" y2="58" stroke="#5A4A3A" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="122" y1="56" x2="110" y2="58" stroke="#5A4A3A" stroke-width="2" stroke-linecap="round"/>
+                        <!-- Nose -->
+                        <ellipse cx="100" cy="76" rx="5" ry="3.5" fill="#8A7A6A"/>
+                        <!-- Sad mouth -->
+                        <path d="M88 86 Q100 80 112 86" stroke="#5A4A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <!-- Tear -->
+                        <path d="M118 70 Q120 78 117 80" stroke="#7BC8F6" stroke-width="2" fill="none" stroke-linecap="round"/>
+                        <!-- Wine glass in paw -->
+                        <g transform="translate(130, 110) rotate(20)">
+                            <rect x="-1.5" y="0" width="3" height="14" rx="1" fill="#C4A882"/>
+                            <path d="M-10 14 L10 14 L8 20 L-8 20 Z" fill="#C4A882"/>
+                            <ellipse cx="0" cy="-2" rx="10" ry="12" fill="none" stroke="#C4A882" stroke-width="2.5"/>
+                            <path d="M-8 2 Q-8 -8 0 -10 Q8 -8 8 2 Q6 5 0 6 Q-6 5 -8 2Z" fill="rgba(139,26,58,0.3)"/>
+                        </g>
+                        <!-- Tail -->
+                        <path d="M155 125 Q170 115 165 100 Q162 95 158 100" stroke="#C4B5A0" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="not-found-happy-animal hidden" id="happyAnimal">
+                    <svg class="happy-animal-svg" viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Body -->
+                        <ellipse cx="100" cy="130" rx="55" ry="40" fill="#D4C5B0"/>
+                        <!-- Head -->
+                        <circle cx="100" cy="70" r="40" fill="#D4C5B0"/>
+                        <!-- Ears -->
+                        <ellipse cx="68" cy="42" rx="14" ry="18" fill="#C4B5A0" transform="rotate(-15 68 42)"/>
+                        <ellipse cx="132" cy="42" rx="14" ry="18" fill="#C4B5A0" transform="rotate(15 132 42)"/>
+                        <ellipse cx="68" cy="42" rx="9" ry="12" fill="#E8D5C0" transform="rotate(-15 68 42)"/>
+                        <ellipse cx="132" cy="42" rx="9" ry="12" fill="#E8D5C0" transform="rotate(15 132 42)"/>
+                        <!-- Eyes (happy, closed) -->
+                        <path d="M78 65 Q85 58 92 65" stroke="#5A4A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <path d="M108 65 Q115 58 122 65" stroke="#5A4A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <!-- Nose -->
+                        <ellipse cx="100" cy="76" rx="5" ry="3.5" fill="#8A7A6A"/>
+                        <!-- Happy mouth -->
+                        <path d="M85 86 Q100 98 115 86" stroke="#5A4A3A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        <!-- Blush -->
+                        <ellipse cx="72" cy="78" rx="8" ry="5" fill="rgba(255,150,150,0.3)"/>
+                        <ellipse cx="128" cy="78" rx="8" ry="5" fill="rgba(255,150,150,0.3)"/>
+                        <!-- Wine glass in paw (celebrating) -->
+                        <g transform="translate(140, 100) rotate(-10)">
+                            <rect x="-1.5" y="0" width="3" height="14" rx="1" fill="#C4A882"/>
+                            <path d="M-10 14 L10 14 L8 20 L-8 20 Z" fill="#C4A882"/>
+                            <ellipse cx="0" cy="-2" rx="10" ry="12" fill="none" stroke="#C4A882" stroke-width="2.5"/>
+                            <path d="M-8 2 Q-8 -8 0 -10 Q8 -8 8 2 Q6 5 0 6 Q-6 5 -8 2Z" fill="rgba(139,26,58,0.3)"/>
+                        </g>
+                        <!-- Sparkles -->
+                        <g fill="#FFD700">
+                            <polygon points="45,55 47,50 49,55 44,52 50,52"/>
+                            <polygon points="155,45 157,40 159,45 154,42 160,42"/>
+                            <polygon points="160,80 162,75 164,80 159,77 165,77"/>
+                        </g>
+                        <!-- Tail (wagging up) -->
+                        <path d="M155 120 Q175 105 170 85 Q168 80 163 85" stroke="#C4B5A0" stroke-width="4" fill="none" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h2 id="notFoundTitle">К сожалению, мы не смогли найти это вино</h2>
+                <p id="notFoundSubtitle">Пока это вино отсутствует в нашем каталоге</p>
+                <div class="photo-offer" id="photoOffer">
+                    <p class="photo-offer-text" id="photoOfferText">Помогите нам развиться! Отправьте фото этикетки, и мы добавим это вино в каталог</p>
+                    <div class="photo-offer-buttons" id="photoOfferButtons">
+                        <button class="btn btn-primary btn-sm" id="sendPhotoYes">Да, отправлю</button>
+                        <button class="btn btn-secondary btn-sm" id="sendPhotoNo">Нет, спасибо</button>
+                    </div>
+                    <div class="photo-upload-area hidden" id="photoUploadArea">
+                        <input type="file" id="photoUploadInput" accept="image/*" capture="environment" hidden>
+                        <button class="btn btn-primary btn-sm" id="photoUploadBtn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            Выбрать фото
+                        </button>
+                        <div class="photo-success hidden" id="photoSuccess">
+                            <span class="photo-success-text">Ура! Спасибо большое! 🎉<br><small>Ваше фото поможет нам стать лучше</small></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="alternatives" id="alternatives"></div>
+            </div>
+            <button class="btn btn-outline" id="scanAgainBtn2">
+                Сканировать ещё
+            </button>
+        </section>
+
+        <!-- Recent Scans -->
+        <section class="recent-section" id="recentSection">
+            <h2 class="section-title">Недавние сканы</h2>
+            <div class="recent-list" id="recentList">
+                <p class="empty-state">Пока нет сканов</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Crop Modal -->
+    <div class="crop-modal hidden" id="cropModal">
+        <div class="crop-header">
+            <h3>Обрежьте фото</h3>
+            <p>Выделите область с этикеткой для лучшего распознавания</p>
+        </div>
+        <div class="crop-container">
+            <img id="cropImage" src="">
+        </div>
+        <div class="crop-actions">
+            <button class="btn btn-secondary" id="cropCancel">Отмена</button>
+            <button class="btn btn-primary" id="cropConfirm">Начать поиск</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
