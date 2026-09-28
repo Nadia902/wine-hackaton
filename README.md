@@ -7,8 +7,8 @@
 ### 1. Клонировать проект
 
 ```bash
-git clone <repo-url> svoe-vino
 cd svoe-vino
+git clone https://github.com/Nadia902/wine-hackaton.git
 ```
 
 ### 2. Настроить окружение
