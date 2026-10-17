@@ -174,3 +174,12 @@ python -m backend.app
   --endpoint 'http://127.0.0.1:8000/v1/eval/predict' \
   --output ./eval/predictions.jsonl
 ```
+<img width="495" height="857" alt="2026-10-17_22-14-45" src="https://github.com/user-attachments/assets/99450660-f362-495f-a124-799fdd18864c" />
+<img width="457" height="888" alt="2026-10-17_22-15-30" src="https://github.com/user-attachments/assets/41eb99a0-bca6-488f-a152-496f90859683" />
+<img width="484" height="659" alt="2026-10-17_22-17-08" src="https://github.com/user-attachments/assets/402437a0-e464-4957-b2bc-a918aa1bb40a" />
+<img width="498" height="614" alt="2026-10-17_22-17-49" src="https://github.com/user-attachments/assets/10c7960a-51be-45e8-886d-6403e4b3d947" />
+
+
+
+
+
